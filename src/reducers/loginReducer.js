@@ -4,18 +4,33 @@ import { selectLogin } from '../Utils/selectors'
 
 // Le state initial de la feature freelances
 const initialState = {
+    user: {
+        email: null,
+        id: null,
+        firstName: null,
+        lastName: null,
+    },
     // le statut permet de suivre l'état de la requête
-    status: 'void',
+    status: 'unauthenticated',
     // les données lorsque la requête a fonctionné
     token: null,
     // l'erreur lorsque la requête échoue
     error: null,
+    errorEditUser: null,
 }
 
 // Fetching action
 const loginFetching = createAction('login/fetching')
 const loginResolved = createAction('login/resolved')
 const loginRejected = createAction('login/rejected')
+
+const userResolved = createAction('user/resolved')
+const userRejected = createAction('user/rejected')
+
+const updateResolved = createAction('update/resolved')
+const updateRejected = createAction('update/rejected')
+
+export const logOut = createAction('login/logout')
 
 // const loginResolved = createAction(
 //     'login/resolved',
@@ -34,12 +49,11 @@ const loginRejected = createAction('login/rejected')
 export function fetchLogin(email, password) {
     return async (dispatch, getState) => {
         const status = selectLogin(getState()).status
-        console.log(status)
 
-        if (status === 'pending' || status === 'updating') {
+        if (!status === 'unauthenticated') {
             return
         }
-        // on envoie l'action fething
+        // on envoie l'action fetching
         dispatch(loginFetching())
         try {
             const response = await fetch(
@@ -59,70 +73,203 @@ export function fetchLogin(email, password) {
             const data = await response.json()
             // on envoie l'action qui récupère les datas
             dispatch(loginResolved(data.body.token))
-            console.log("data", data)
+            //console.log("data", data)
         } catch (error) {
             // on envoie l'action error
+            console.log(error)
             dispatch(loginRejected(error))
         }
     }
 }
 
-// Login reducer
+export function fetchUser(idToken) {
+    return async (dispatch, getState) => {
+        const status = selectLogin(getState()).status
+        console.log(status)
+
+        // le statut n'est pas updating donc le token n'est pas envoyé
+        if (!status === 'updating') {
+            return
+        }
+
+        try {
+            const response = await fetch(
+                `http://localhost:3001/api/v1/user/profile`,
+                {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: 'Bearer ' + idToken,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
+            const data = await response.json()
+            // on envoie l'action qui récupère les datas du user
+            dispatch(userResolved(data.body))
+            //console.log("data", data.body)
+        } catch (error) {
+            // on envoie l'action error
+            dispatch(userRejected(error))
+        }
+    }
+}
+
+
+export function updateUser(idToken, firstName, lastName) {
+    return async (dispatch, getState) => {
+        const status = selectLogin(getState()).status
+        const newFirstName = firstName
+        const newLastBame = lastName
+
+        // le statut n'est pas updating donc le token n'est pas envoyé
+        if (!status === 'updating') {
+            return
+        }
+
+        try {
+            const response = await fetch(
+                `http://localhost:3001/api/v1/user/profile`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: 'Bearer ' + idToken,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        firstName: newFirstName,
+                        lastName: newLastBame,
+                    }),
+                }
+            )
+            const data = await response.json()
+            // on envoie l'action pour modifier le state nom et prénom
+            dispatch(updateResolved(data.body))
+            console.log("data", data.body)
+        } catch (error) {
+            // on envoie l'action error
+            dispatch(updateRejected(error))
+        }
+    }
+}
+
+// Reducer
 // valeur par defaut du state initialState
 export default createReducer(initialState, (builder) =>
     builder
         // faire des changements via immer
-        // draft c'est une copie de notre state
-        // action sont les params de l'action
+        // draft c'est une copie de notre state et action sont les params de l'action
 
-        // si l'action est de type Fetching
+        // si l'action est de type loginFetching
         .addCase(loginFetching, (draft) => {
-            // si le statut est void
-            if (draft.status === 'void') {
+            // si le statut est unauthenticated
+            if (draft.status === 'unauthenticated') {
                 // on passe en pending
                 draft.status = 'pending'
                 return
             }
-            // si le statut est rejected
-            if (draft.status === 'rejected') {
-                // on supprime l'erreur et on passe en pending
-                draft.error = null
-                draft.status = 'pending'
-                return
-            }
-            // si le statut est resolved
-            if (draft.status === 'resolved') {
-                // on passe en updating (requête en cours mais des données sont déjà présentes)
+            // sinon l'action est ignorée
+            return
+        })
+        // si l'action est de type loginResolved
+        .addCase(loginResolved, (draft, action) => {
+            // si la requête est en cours
+            if (draft.status === 'pending') {
+                // on passe en updating et récupère le payload token
+                draft.token = action.payload
                 draft.status = 'updating'
                 return
             }
             // sinon l'action est ignorée
             return
         })
-        // si l'action est de type Resolved
-        .addCase(loginResolved, (draft, action) => {
+        // si l'action est de type loginRejected
+        .addCase(loginRejected, (draft, action) => {
             // si la requête est en cours
-            if (draft.status === 'pending' || draft.status === 'updating') {
-                // on passe en resolved et récupère le payload soit nos données
-                draft.token = action.payload
-                draft.status = 'resolved'
+            if (draft.status === 'pending') {
+                // on passe en rejected, on sauvegarde l'erreur et on supprime les données
+                draft.error = action.payload
+                draft.token = null
+                draft.status = 'unauthenticated'
+                return
+            }
+            // sinon l'action est ignorée
+            return
+        })
+        // si l'action est de type updating
+        .addCase(userResolved, (draft, action) => {
+            // si la requête à bien reçu le token
+            if (draft.status === 'updating') {
+                // on passe en authenticated et récupère le payload soit nos données
+                const firstName = action.payload.firstName
+                draft.user.firstName = firstName
+                const lastName = action.payload.lastName
+                draft.user.lastName = lastName
+                const email = action.payload.email
+                draft.user.email = email
+                const id = action.payload.id
+                draft.user.id = id
+                draft.status = 'authenticated'
                 return
             }
             // sinon l'action est ignorée
             return
         })
         // si l'action est de type Rejected
-        .addCase(loginRejected, (draft, action) => {
+        .addCase(userRejected, (draft, action) => {
             // si la requête est en cours
-            if (draft.status === 'pending' || draft.status === 'updating') {
+            if (draft.status === 'updating') {
                 // on passe en rejected, on sauvegarde l'erreur et on supprime les données
                 draft.error = action.payload
-                draft.token = null
+                draft.user.firstName = null
+                draft.user.lastName  = null
                 draft.status = 'rejected'
+                return
+            }
+        })
+
+        // si l'action est de type updating
+        .addCase(updateResolved, (draft, action) => {
+            draft.status = 'updating'
+            if (draft.status === 'updating') {
+                // on passe en resolved et récupère le payload soit nos données
+                const firstName = action.payload.firstName
+                draft.user.firstName = firstName
+
+                const lastName = action.payload.lastName
+                draft.user.lastName = lastName
+                const email = action.payload.email
+                draft.user.email = email
+                const id = action.payload.id
+                draft.user.id = id
+                draft.status = 'authenticated'
                 return
             }
             // sinon l'action est ignorée
             return
+        })
+        // si l'action est de type Rejected
+        .addCase(updateRejected, (draft, action) => {
+            draft.status = 'updating'
+            if (draft.status === 'updating') {
+                // on passe en rejected, on sauvegarde l'erreur et on supprime les données
+                draft.error = action.payload
+                draft.user.firstName = null
+                draft.user.lastName  = null
+                draft.status = 'rejected'
+                return
+            }
+        })
+        // si l'action est de se déloguer
+        .addCase(logOut, (draft) => {
+            draft.user.firstName = null;
+            draft.user.lastName = null;
+            draft.user.email = null;
+            draft.user.id = null;
+            draft.status = 'unauthenticated';
+            draft.token = null;
+            draft.error = null;
         })
 
 )

@@ -1,71 +1,90 @@
 import React, { useEffect, useState } from 'react'
 // import { Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectLogin, selectUser } from '../../Utils/selectors';
-// import { setFirstName, setLastName } from '../../reducers/userEditReducer';
-import { fetchUser } from '../../reducers/userReducer'
+import { selectLogin } from '../../Utils/selectors';
+import { fetchUser, updateUser } from '../../reducers/loginReducer'
 
 export default function UserProfile() {
-
-  const [edit, SetEdit] = useState(false);
+  const [editForm, setEditForm] = useState(false);
 
   const dispatch = useDispatch();
   const idToken = useSelector(selectLogin).token;
   console.log(idToken)
+  //console.log(user)
 
-  const user = useSelector(selectUser);
-  const isResolved = user.status === 'resolved';
+  const user = useSelector(selectLogin);
+  console.log(user.status)
+  const isResolved = user.status === 'authenticated';
 
   const [editFirstName, setEditFirstName] = useState('');
+  //console.log(editFirstName)
   const [editLastName, setEditLastName] = useState('');
 
   useEffect(() => {
     dispatch(fetchUser(idToken));
   }, [idToken, dispatch])
 
-  console.log(user)
 
-  // const handleSubmitUpdate = (e) => {
-  //   e.preventDefault();
+  const handleSubmitUpdate = (e) => {
+    e.preventDefault();
 
-  //   // on envoit en dans la payload du state le nouveau nom et prénom
-  //   dispatch(fetchUpdateUser());
-  // };
+    const loginRegex = /^[a-zA-Z]+[a-zA-Z'-]?[a-zA-Z]+$/;
+
+    const updateValidate = () => {
+      if (!loginRegex.test(editFirstName) && editFirstName === user.user.firstName) {
+        return false
+      }
+      if (!loginRegex.test(editLastName) && editLastName === user.user.LastName) {
+        return false
+      }
+      else {
+        return true
+      }
+    }
+
+    const updateIsValid = updateValidate();
+    console.log(updateIsValid)
+    if (updateIsValid) {
+      // on envoie dans le state le nouveau nom et prénom et le token
+      dispatch(updateUser(idToken, editFirstName, editLastName));
+    }
+    setEditForm(false);
+  };
 
   return (
     <main className="main bg-dark">
       <div className="header">
-        {edit ? (
+        {editForm ? (
           <>
             <h1>Welcome back</h1>
-            {/* onSubmit={handleSubmitUpdate} */}
-            <form >
+            <form onSubmit={handleSubmitUpdate} >
               {isResolved &&
                 <div className=" input-wrapper input-wrapper--user">
                   <input
+                    placeholder="Prénom"
                     className="user-input-editor"
                     type="text"
-                    id="username"
-                    placeholder={user.data.body.firstName}
+                    id="firstName"
+                    value={editFirstName}
                     onChange={(e) => setEditFirstName(e.target.value)}
                   />
                   <input
+                    placeholder="Nom"
                     className="user-input-editor"
                     type="text"
-                    id="lastname"
-                    placeholder={user.data.body.lastName}
+                    id="lastName"
+                    value={editLastName}
                     onChange={(e) => setEditLastName(e.target.value)}
                   />
                 </div>
               }
-
               <div className="user-button">
-                <button className="edit-button" type="submit">
+                <button className="edit-button edit-button--profile" type="submit">
                   Save
                 </button>
                 <button
                   className="edit-button"
-                  onClick={() => SetEdit(false)}
+                  onClick={() => setEditForm(false)}
                 >
                   Cancel
                 </button>
@@ -74,14 +93,16 @@ export default function UserProfile() {
           </>
         ) : (
           <>
-            <h1>
-              Welcome back
-              <br />
-              {/* {user.user.firstName} {user.user.lastName} */}
-            </h1>
+            {isResolved &&
+              <h1>
+                Welcome back
+                <br />
+                {user.user.firstName} {user.user.lastName}
+              </h1>
+            }
             <button
               className="edit-button"
-              onClick={() => SetEdit(true)}
+              onClick={() => setEditForm(true)}
             >
               Edit Name
             </button>
@@ -120,9 +141,6 @@ export default function UserProfile() {
           <button className="transaction-button">View transactions</button>
         </div>
       </section>
-      {/* {!isResolved && (
-        <Navigate to='/' />
-      )} */}
     </main>
   )
 }
