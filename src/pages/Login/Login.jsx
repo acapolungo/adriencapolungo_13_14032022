@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectLogin } from '../../Utils/selectors';
-import { fetchLogin } from '../../reducers/loginReducer';
+import { fetchLogin } from '../../reducers/userReducer';
 // Component
 import Loader from '../../components/Loader/Loader';
 
@@ -43,53 +43,55 @@ export default function Login() {
     };
 
     //const error = login.status === 'unauthenticated';
-    const isLoading = login.status === 'unauthenticated' || login.status === 'pending';
+    //console.log(isLoading)
+    const isLoading = login.status === 'pending';
     const isResolved = login.status === 'updating';
 
     return (
         <>
-            {isLoading ? (
-                <main className="main bg-dark">
-                    <section className="sign-in-content">
-                        <i className="fa fa-user-circle sign-in-icon"></i>
-                        <h1>Sign In</h1>
-                        <form onSubmit={handleSubmit}>
-                            <div className="input-wrapper">
-                                <label htmlFor="username">Username</label>
-                                <input
-                                    placeholder="Email"
-                                    type="text"
-                                    // required="required"
-                                    id="username"
-                                    onChange={(e) => setEmailForm(e.target.value)}
-                                />
-                            </div>
-                            <div className="input-wrapper">
-                                <label htmlFor="password">Password</label>
-                                <input
-                                    placeholder="Password"
-                                    type="password"
-                                    // required="required"
-                                    id="password"
-                                    onChange={(e) => setPasswordForm(e.target.value)}
-                                />
-                            </div>
-                            {error &&
-                                <div className="error">{error}</div>
-                            }
-                            <div className="input-remember">
-                                <input type="checkbox" id="remember-me" />
-                                <label htmlFor="remember-me">Remember me</label>
-                            </div>
-                            <button className="sign-in-button">Sign In</button>
-                        </form>
-                    </section>
-
-                    {isResolved && (
-                        <Navigate to='/profile' />
-                    )}
-                </main>
-            ) : <Loader />}
+            {isLoading ?
+                <Loader />
+                : (
+                    <main className="main bg-dark">
+                        <section className="sign-in-content">
+                            <i className="fa fa-user-circle sign-in-icon"></i>
+                            <h1>Sign In</h1>
+                            <form onSubmit={handleSubmit}>
+                                <div className="input-wrapper">
+                                    <label htmlFor="username">Username</label>
+                                    <input
+                                        placeholder="Email"
+                                        type="text"
+                                        // required="required"
+                                        id="username"
+                                        onChange={(e) => setEmailForm(e.target.value)}
+                                    />
+                                </div>
+                                <div className="input-wrapper">
+                                    <label htmlFor="password">Password</label>
+                                    <input
+                                        placeholder="Password"
+                                        type="password"
+                                        // required="required"
+                                        id="password"
+                                        onChange={(e) => setPasswordForm(e.target.value)}
+                                    />
+                                </div>
+                                {error &&
+                                    <div className="error">{error}</div>
+                                }
+                                <div className="input-remember">
+                                    <input type="checkbox" id="remember-me" />
+                                    <label htmlFor="remember-me">Remember me</label>
+                                </div>
+                                <button className="sign-in-button">Sign In</button>
+                            </form>
+                        </section>
+                        {isResolved && (
+                            <Navigate to='/profile' />
+                        )}
+                    </main>
+                )}
         </>
     )
 }

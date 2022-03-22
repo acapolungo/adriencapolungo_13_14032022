@@ -2,22 +2,22 @@ import React, { useEffect, useState } from 'react'
 // import { Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectLogin } from '../../Utils/selectors';
-import { fetchUser, updateUser } from '../../reducers/loginReducer'
+import { fetchUser, updateUser } from '../../reducers/userReducer'
 
 export default function UserProfile() {
   const [editForm, setEditForm] = useState(false);
 
   const dispatch = useDispatch();
   const idToken = useSelector(selectLogin).token;
-  console.log(idToken)
-  //console.log(user)
+  // console.log(idToken)
+  // console.log(user)
 
   const user = useSelector(selectLogin);
   console.log(user.status)
   const isResolved = user.status === 'authenticated';
 
   const [editFirstName, setEditFirstName] = useState('');
-  //console.log(editFirstName)
+  // console.log(editFirstName)
   const [editLastName, setEditLastName] = useState('');
 
   useEffect(() => {

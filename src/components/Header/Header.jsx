@@ -2,7 +2,7 @@ import React from 'react'
 import { Link, Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectLogin } from '../../Utils/selectors';
-import { logOut } from '../../reducers/loginReducer';
+import { logOut } from '../../reducers/userReducer';
 
 export default function Header() {
 
