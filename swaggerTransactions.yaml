@@ -11,18 +11,26 @@ basePath: /api/v1
 schemes:
   - http
 paths:
-  /transactions:
+  /transactions/{startDate}/{endDate}:
     get:
       security:
         - Bearer: []
       tags:
         - "User Transactions"
-      summary: "User transactions (all)"
-      description: "Show all current transactions sorted by date"
-      operationId: "showSortedByDateTansactions"
+      summary: "User transactions"
+      description: "Show all transactions per current month"
+      operationId: "showMonthlyTransactions"
       produces:
         - "application/json"
       parameters:
+        - name: "startDate"
+          in: "path"
+          required: true
+          type: "string"
+        - name: "endDate"
+          in: "path"
+          required: true
+          type: "string"
         - in: "header"
           type: "string"
           name: "Authorization"
@@ -32,6 +40,7 @@ paths:
         '200':
           description: "User transactions retrieved successully"
           schema:
+            items:
               $ref: '#/definitions/Transaction'
         '400':
           description: "Invalid Fields"
@@ -43,9 +52,9 @@ paths:
         - Bearer: []
       tags:
         - "User Transaction detail"
-      summary: "User transactions (single)"
+      summary: "User transaction"
       description: "Show a transaction details"
-      operationId: "showTansactionDetails"
+      operationId: "showTransactionDetails"
       produces:
         - "application/json"
       parameters:
@@ -64,7 +73,7 @@ paths:
         '200':
           description: "User transaction retrieved successully"
           schema:
-            $ref: '#/definitions/Transaction'
+              $ref: '#/definitions/Transaction'
         '400':
           description: "Invalid Fields"
         '500':
@@ -139,12 +148,16 @@ definitions:
       notes:
         type: "string"
         description: "notes field for user"
-  TransactionId:
+  startDate:
     type: "object"
     properties:
-      id:
-        type: "integer"
-        format: int64
+      startDate:
+        type: "string"
+  endDate:
+    type: "object"
+    properties:
+      endDate:
+        type: "string"
   TransactionUpdate:
     type: "object"
     properties:

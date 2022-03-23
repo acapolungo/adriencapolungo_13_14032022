@@ -9,11 +9,11 @@ const initialState = {
         lastName: null,
     },
     // le statut permet de suivre l'état de la requête
-    status: 'unauthenticated',
+    status: false,
     // les données lorsque la requête a fonctionné
     token: null,
     // l'erreur lorsque la requête échoue
-    error: null,
+    errorMessage: null,
 }
 
 // Fetching action
@@ -24,6 +24,7 @@ export const loginRejected = createAction('login/rejected')
 export const userResolved = createAction('user/resolved')
 export const userRejected = createAction('user/rejected')
 
+export const updateFetching = createAction('update/fetching')
 export const updateResolved = createAction('update/resolved')
 export const updateRejected = createAction('update/rejected')
 
@@ -39,7 +40,7 @@ export default createReducer(initialState, (builder) =>
         // si l'action est de type loginFetching
         .addCase(loginFetching, (draft) => {
             // si le statut est unauthenticated
-            if (draft.status === 'unauthenticated') {
+            if (draft.status === false) {
                 // on passe en pending
                 draft.status = 'pending'
                 return
@@ -64,9 +65,9 @@ export default createReducer(initialState, (builder) =>
             // si la requête est en cours
             if (draft.status === 'pending') {
                 // on passe en rejected, on sauvegarde l'erreur et on supprime les données
-                draft.error = action.payload
+                draft.errorMessage = action.payload
                 draft.token = null
-                draft.status = 'unauthenticated'
+                draft.status = false
                 return
             }
             // sinon l'action est ignorée
@@ -85,7 +86,7 @@ export default createReducer(initialState, (builder) =>
                 draft.user.email = email
                 const id = action.payload.id
                 draft.user.id = id
-                draft.status = 'authenticated'
+                draft.status = true
                 return
             }
             // sinon l'action est ignorée
@@ -96,17 +97,22 @@ export default createReducer(initialState, (builder) =>
             // si la requête est en cours
             if (draft.status === 'updating') {
                 // on passe en rejected, on sauvegarde l'erreur et on supprime les données
-                draft.error = action.payload
+                draft.errorMessage = action.payload
                 draft.user.firstName = null
                 draft.user.lastName  = null
                 draft.status = 'rejected'
                 return
             }
         })
+        // si lon est connecté
+        .addCase(updateFetching, (draft, action) => {
+            if(draft.status === true) {
+                draft.status = 'updating'
+            }
+        })
 
         // si l'action est de type updating
         .addCase(updateResolved, (draft, action) => {
-            draft.status = 'updating'
             if (draft.status === 'updating') {
                 // on passe en resolved et récupère le payload soit nos données
                 const firstName = action.payload.firstName
@@ -118,7 +124,7 @@ export default createReducer(initialState, (builder) =>
                 draft.user.email = email
                 const id = action.payload.id
                 draft.user.id = id
-                draft.status = 'authenticated'
+                draft.status = true
                 return
             }
             // sinon l'action est ignorée
@@ -129,7 +135,7 @@ export default createReducer(initialState, (builder) =>
             draft.status = 'updating'
             if (draft.status === 'updating') {
                 // on passe en rejected, on sauvegarde l'erreur et on supprime les données
-                draft.error = action.payload
+                draft.errorMessage = action.payload
                 draft.user.firstName = null
                 draft.user.lastName  = null
                 draft.status = 'rejected'
@@ -142,7 +148,7 @@ export default createReducer(initialState, (builder) =>
             draft.user.lastName = null;
             draft.user.email = null;
             draft.user.id = null;
-            draft.status = 'unauthenticated';
+            draft.status = false;
             draft.token = null;
             draft.error = null;
         })

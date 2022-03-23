@@ -1,13 +1,13 @@
 import { selectLogin } from '../Utils/selectors'
 import { loginFetching, loginResolved, loginRejected } from '../reducers/userReducer'
 import { userResolved, userRejected } from '../reducers/userReducer'
-import { updateResolved, updateRejected } from '../reducers/userReducer'
+import { updateFetching, updateResolved, updateRejected } from '../reducers/userReducer'
 
 export function fetchLogin(email, password) {
     return async (dispatch, getState) => {
         const status = selectLogin(getState()).status
 
-        if (!status === 'unauthenticated') {
+        if (!status === false) {
             return
         }
         // on envoie l'action fetching
@@ -66,7 +66,7 @@ export function fetchUser(idToken) {
             //console.log("data", data.body)
         } catch (error) {
             // on envoie l'action error
-            dispatch(userRejected(error))
+            dispatch(userRejected(error.message))
         }
     }
 }
@@ -82,7 +82,7 @@ export function updateUser(idToken, firstName, lastName) {
         if (!status === 'updating') {
             return
         }
-
+        dispatch(updateFetching())
         try {
             const response = await fetch(
                 `http://localhost:3001/api/v1/user/profile`,
@@ -105,7 +105,7 @@ export function updateUser(idToken, firstName, lastName) {
             // console.log("data", data.body)
         } catch (error) {
             // on envoie l'action error
-            dispatch(updateRejected(error))
+            dispatch(updateRejected(error.message))
         }
     }
 }

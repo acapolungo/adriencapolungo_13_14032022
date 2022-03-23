@@ -7,9 +7,9 @@ import { logOut } from '../../reducers/userReducer';
 export default function Header() {
 
     // const dispatch = useDispatch();
-    const user = useSelector(selectLogin);
+    const profile = useSelector(selectLogin);
     const dispatch = useDispatch();
-    const isResolved = user.status === 'authenticated';
+    const isResolved = profile.status === true;
     //console.log(isResolved)
 
     if (!isResolved) {
@@ -31,7 +31,7 @@ export default function Header() {
                     <>
                         <Link className="main-nav-item" to="/profile">
                             <i className="fa fa-user-circle"></i>{' '}
-                            {user.user.firstName} {user.user.lastName}
+                            {profile.user.firstName} {profile.user.lastName}
                         </Link>
                         <Link className="main-nav-item" to="/" onClick={() => dispatch(logOut())} >
                             <i className="fa fa-sign-out"></i> Sign Out
