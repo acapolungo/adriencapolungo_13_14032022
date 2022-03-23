@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 // import { Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectLogin } from '../../Utils/selectors';
-import { fetchUser, updateUser } from '../../reducers/userReducer'
+import { fetchUser, updateUser } from '../../Utils/query';
 
 export default function UserProfile() {
   const [editForm, setEditForm] = useState(false);
@@ -43,7 +43,6 @@ export default function UserProfile() {
     }
 
     const updateIsValid = updateValidate();
-    console.log(updateIsValid)
     if (updateIsValid) {
       // on envoie dans le state le nouveau nom et prénom et le token
       dispatch(updateUser(idToken, editFirstName, editLastName));
@@ -104,7 +103,7 @@ export default function UserProfile() {
               className="edit-button"
               onClick={() => setEditForm(true)}
             >
-              Edit Name
+              Edit Profile
             </button>
           </>
         )}

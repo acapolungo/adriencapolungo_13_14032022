@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectLogin } from '../../Utils/selectors';
-import { fetchLogin } from '../../reducers/userReducer';
+import { fetchLogin } from '../../Utils/query';
 // Component
 import Loader from '../../components/Loader/Loader';
 
@@ -32,6 +32,10 @@ export default function Login() {
             return true
         }
     }
+    
+    const errorMessage = login.error;
+    const isLoading = login.status === 'pending';
+    const isResolved = login.status === 'updating';
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -41,11 +45,7 @@ export default function Login() {
             dispatch(fetchLogin(email, password))
         };
     };
-
-    //const error = login.status === 'unauthenticated';
-    //console.log(isLoading)
-    const isLoading = login.status === 'pending';
-    const isResolved = login.status === 'updating';
+    
 
     return (
         <>
@@ -79,6 +79,9 @@ export default function Login() {
                                 </div>
                                 {error &&
                                     <div className="error">{error}</div>
+                                }
+                                {errorMessage && 
+                                    <div className="error">Merci de saisir un identifiant et mot de passe valide</div>
                                 }
                                 <div className="input-remember">
                                     <input type="checkbox" id="remember-me" />

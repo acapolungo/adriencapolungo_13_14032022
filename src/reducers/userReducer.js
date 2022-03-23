@@ -1,6 +1,4 @@
-// import produce from 'immer';
 import { createAction, createReducer } from '@reduxjs/toolkit'
-import { selectLogin } from '../Utils/selectors'
 
 // Le state initial de la feature freelances
 const initialState = {
@@ -19,145 +17,24 @@ const initialState = {
 }
 
 // Fetching action
-const loginFetching = createAction('login/fetching')
-const loginResolved = createAction('login/resolved')
-const loginRejected = createAction('login/rejected')
+export const loginFetching = createAction('login/fetching')
+export const loginResolved = createAction('login/resolved')
+export const loginRejected = createAction('login/rejected')
 
-const userResolved = createAction('user/resolved')
-const userRejected = createAction('user/rejected')
+export const userResolved = createAction('user/resolved')
+export const userRejected = createAction('user/rejected')
 
-const updateResolved = createAction('update/resolved')
-const updateRejected = createAction('update/rejected')
+export const updateResolved = createAction('update/resolved')
+export const updateRejected = createAction('update/rejected')
 
 export const logOut = createAction('login/logout')
-
-// const loginResolved = createAction(
-//     'login/resolved',
-//     (data) => ({
-//         payload: { data },
-//     })
-// )
-
-// const loginRejected = createAction(
-//     'login/rejected',
-//     (error) => ({
-//         payload: { error },
-//     })
-// )
-
-export function fetchLogin(email, password) {
-    return async (dispatch, getState) => {
-        const status = selectLogin(getState()).status
-
-        if (!status === 'unauthenticated') {
-            return
-        }
-        // on envoie l'action fetching
-        dispatch(loginFetching())
-        try {
-            const response = await fetch(
-                `http://localhost:3001/api/v1/user/login`,
-                {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: email,
-                        password: password,
-                    }),
-                }
-            )
-            const data = await response.json()
-            // on envoie l'action qui récupère les datas
-            dispatch(loginResolved(data.body.token))
-            //console.log("data", data)
-        } catch (error) {
-            // on envoie l'action error
-            console.log(error.message);
-            dispatch(loginRejected(error.message))
-        }
-    }
-}
-
-export function fetchUser(idToken) {
-    return async (dispatch, getState) => {
-        const status = selectLogin(getState()).status
-
-        // le statut n'est pas updating donc le token n'est pas envoyé
-        if (!status === 'updating') {
-            return
-        }
-
-        try {
-            const response = await fetch(
-                `http://localhost:3001/api/v1/user/profile`,
-                {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'application/json',
-                        Authorization: 'Bearer ' + idToken,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            )
-            const data = await response.json()
-            // on envoie l'action qui récupère les datas du user
-            dispatch(userResolved(data.body))
-            //console.log("data", data.body)
-        } catch (error) {
-            // on envoie l'action error
-            dispatch(userRejected(error))
-        }
-    }
-}
-
-
-export function updateUser(idToken, firstName, lastName) {
-    return async (dispatch, getState) => {
-        const status = selectLogin(getState()).status
-        const newFirstName = firstName
-        const newLastBame = lastName
-
-        // le statut n'est pas updating donc le token n'est pas envoyé
-        if (!status === 'updating') {
-            return
-        }
-
-        try {
-            const response = await fetch(
-                `http://localhost:3001/api/v1/user/profile`,
-                {
-                    method: 'PUT',
-                    headers: {
-                        Accept: 'application/json',
-                        Authorization: 'Bearer ' + idToken,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        firstName: newFirstName,
-                        lastName: newLastBame,
-                    }),
-                }
-            )
-            const data = await response.json()
-            // on envoie l'action pour modifier le state nom et prénom
-            dispatch(updateResolved(data.body))
-            // console.log("data", data.body)
-        } catch (error) {
-            // on envoie l'action error
-            dispatch(updateRejected(error))
-        }
-    }
-}
 
 // Reducer
 // valeur par defaut du state initialState
 export default createReducer(initialState, (builder) =>
     builder
         // faire des changements via immer
-        // draft c'est une copie de notre state et action sont les params de l'action
+        // Draft c'est une copie de notre state et action sont les params de l'action
 
         // si l'action est de type loginFetching
         .addCase(loginFetching, (draft) => {
@@ -345,3 +222,17 @@ export default createReducer(initialState, (builder) =>
 //         }
 //     })
 // }
+
+// const loginResolved = createAction(
+//     'login/resolved',
+//     (data) => ({
+//         payload: { data },
+//     })
+// )
+
+// const loginRejected = createAction(
+//     'login/rejected',
+//     (error) => ({
+//         payload: { error },
+//     })
+// )
