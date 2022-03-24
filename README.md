@@ -1,8 +1,7 @@
-![alt text](https://github.com/acapolungo/adriencapolungo_12_22022022/blob/route/public/images/Sportsee-logo.png)
+![alt text](https://github.com/acapolungo/adriencapolungo_13_14032022/blob/home/public/img/argentBankLogo.png)
 
 # Projet 13 : ARGENTBANK "Utilisez une API pour un compte utilisateur bancaire avec React"
 
-This project is create with [Create React App](https://github.com/facebook/create-react-app).
 The model is based on [Figma](https://www.figma.com/file/BMomGVZqLZb811mDMShpLu/UI-design-Sportify-FR?node-id=1%3A2).
 
 ## Backend API
