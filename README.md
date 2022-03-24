@@ -1,8 +1,6 @@
 ![alt text](https://github.com/acapolungo/adriencapolungo_13_14032022/blob/home/public/img/argentBankLogo.png)
 
-# Projet 13 : ARGENTBANK "Utilisez une API pour un compte utilisateur bancaire avec React"
-
-The model is based on [Figma](https://www.figma.com/file/BMomGVZqLZb811mDMShpLu/UI-design-Sportify-FR?node-id=1%3A2).
+# ARGENTBANK "Utilisez une API pour un compte utilisateur bancaire avec React" P13 OC
 
 ## Backend API
 
@@ -48,4 +46,4 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 **Documentation for phase 2 of the project via swagger**
 
 Find the API modelisation proposition for backend here :
-[swagger Taansactions](https://github.com/acapolungo/adriencapolungo_13_14032022/blob/master/swaggerTransactions.yaml).
+[swagger Transactions](https://github.com/acapolungo/adriencapolungo_13_14032022/blob/master/swaggerTransactions.yaml).
