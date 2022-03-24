@@ -6,7 +6,7 @@ The model is based on [Figma](https://www.figma.com/file/BMomGVZqLZb811mDMShpLu/
 
 ## Backend API
 
-This project runs using an API. To launch the API, go to the following repo and follow the instructions (port 3000 used by the API !) :
+This project runs using an API. To launch the API, go to the following repo and follow the instructions :
 
 [Backend](https://github.com/OpenClassrooms-Student-Center/Project-10-Bank-API)
 Run the API first to start this project.
