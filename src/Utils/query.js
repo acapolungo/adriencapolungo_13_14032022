@@ -1,11 +1,11 @@
-import { selectLogin } from '../Utils/selectors'
+import { selectUser } from '../Utils/selectors'
 import { loginFetching, loginResolved, loginRejected } from '../reducers/userReducer'
 import { userResolved, userRejected } from '../reducers/userReducer'
 import { updateFetching, updateResolved, updateRejected } from '../reducers/userReducer'
 
 export function fetchLogin(email, password) {
     return async (dispatch, getState) => {
-        const status = selectLogin(getState()).status
+        const status = selectUser(getState()).status
 
         if (!status === false) {
             return
@@ -30,6 +30,7 @@ export function fetchLogin(email, password) {
             const data = await response.json()
             // on envoie l'action qui récupère les datas
             dispatch(loginResolved(data.body.token))
+            localStorage.setItem('jwt', data.body.token)
             //console.log("data", data)
         } catch (error) {
             // on envoie l'action error
@@ -41,7 +42,7 @@ export function fetchLogin(email, password) {
 
 export function fetchUser(idToken) {
     return async (dispatch, getState) => {
-        const status = selectLogin(getState()).status
+        const status = selectUser(getState()).status
 
         // le statut n'est pas updating donc le token n'est pas envoyé
         if (!status === 'updating') {
@@ -63,7 +64,7 @@ export function fetchUser(idToken) {
             const data = await response.json()
             // on envoie l'action qui récupère les datas du user
             dispatch(userResolved(data.body))
-            //console.log("data", data.body)
+            //console.log("data", data)
         } catch (error) {
             // on envoie l'action error
             dispatch(userRejected(error.message))
@@ -74,7 +75,7 @@ export function fetchUser(idToken) {
 
 export function updateUser(idToken, firstName, lastName) {
     return async (dispatch, getState) => {
-        const status = selectLogin(getState()).status
+        const status = selectUser(getState()).status
         const newFirstName = firstName
         const newLastBame = lastName
 
@@ -102,7 +103,7 @@ export function updateUser(idToken, firstName, lastName) {
             const data = await response.json()
             // on envoie l'action pour modifier le state nom et prénom
             dispatch(updateResolved(data.body))
-            // console.log("data", data.body)
+            //console.log("data", data.body)
         } catch (error) {
             // on envoie l'action error
             dispatch(updateRejected(error.message))

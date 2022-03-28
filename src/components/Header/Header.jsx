@@ -1,16 +1,26 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { Link, Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectLogin } from '../../Utils/selectors';
+import { selectUser } from '../../Utils/selectors';
 import { logOut } from '../../reducers/userReducer';
+import { fetchUser } from '../../Utils/query';
 
 export default function Header() {
 
     // const dispatch = useDispatch();
-    const profile = useSelector(selectLogin);
+    const profile = useSelector(selectUser);
     const dispatch = useDispatch();
     const isResolved = profile.status === true;
-    //console.log(isResolved)
+    const JwtLocalToken = localStorage.getItem('jwt');
+
+    useEffect(() => {
+        JwtLocalToken && dispatch(fetchUser(JwtLocalToken))
+    }, [JwtLocalToken, dispatch]);
+
+    const logOutToken = () => {
+        dispatch(logOut())
+        localStorage.removeItem('jwt');
+    }
 
     if (!isResolved) {
         <Navigate to='/' />
@@ -33,7 +43,7 @@ export default function Header() {
                             <i className="fa fa-user-circle"></i>{' '}
                             {profile.user.firstName} {profile.user.lastName}
                         </Link>
-                        <Link className="main-nav-item" to="/" onClick={() => dispatch(logOut())} >
+                        <Link className="main-nav-item" to="/" onClick={logOutToken} >
                             <i className="fa fa-sign-out"></i> Sign Out
                         </Link>
                     </>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 // import { Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectLogin } from '../../Utils/selectors';
+import { selectUser } from '../../Utils/selectors';
 import { fetchUser, updateUser } from '../../Utils/query';
 import Loader from '../../components/Loader/Loader';
 
@@ -9,11 +9,13 @@ export default function UserProfile() {
   const [editForm, setEditForm] = useState(false);
 
   const dispatch = useDispatch();
-  const idToken = useSelector(selectLogin).token;
+  const idToken = useSelector(selectUser).token;
+  const JwtLocalToken = localStorage.getItem('jwt');
+  // console.log(JwtLocalToken)
   // console.log(idToken)
   // console.log(user)
 
-  const profile = useSelector(selectLogin);
+  const profile = useSelector(selectUser);
   const user = profile.user;
   console.log(profile.status)
   const isResolved = profile.status === true;
@@ -21,11 +23,10 @@ export default function UserProfile() {
   console.log('isLoading :' + isLoading)
 
   const [editFirstName, setEditFirstName] = useState('');
-  // console.log(editFirstName)
   const [editLastName, setEditLastName] = useState('');
 
   useEffect(() => {
-    dispatch(fetchUser(idToken));
+    dispatch(fetchUser(idToken))
   }, [idToken, dispatch])
 
 
@@ -49,7 +50,7 @@ export default function UserProfile() {
     const updateIsValid = updateValidate();
     if (updateIsValid) {
       // on envoie dans le state le nouveau nom et prénom et le token
-      dispatch(updateUser(idToken, editFirstName, editLastName));
+      dispatch(updateUser(JwtLocalToken, editFirstName, editLastName));
     }
     setEditForm(false);
   };

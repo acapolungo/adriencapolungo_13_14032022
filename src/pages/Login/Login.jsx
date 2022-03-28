@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectLogin } from '../../Utils/selectors';
+import { selectUser } from '../../Utils/selectors';
 import { fetchLogin } from '../../Utils/query';
 // Component
 import Loader from '../../components/Loader/Loader';
@@ -9,7 +9,7 @@ import Loader from '../../components/Loader/Loader';
 export default function Login() {
 
     const dispatch = useDispatch();
-    const login = useSelector(selectLogin);
+    const login = useSelector(selectUser);
 
     const [email, setEmailForm] = useState('');
     const [password, setPasswordForm] = useState('');

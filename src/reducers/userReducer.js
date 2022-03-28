@@ -76,6 +76,7 @@ export default createReducer(initialState, (builder) =>
         // si l'action est de type updating
         .addCase(userResolved, (draft, action) => {
             // si la requête à bien reçu le token
+            draft.status = 'updating'
             if (draft.status === 'updating') {
                 // on passe en authenticated et récupère le payload soit nos données
                 const firstName = action.payload.firstName
@@ -117,7 +118,6 @@ export default createReducer(initialState, (builder) =>
                 // on passe en resolved et récupère le payload soit nos données
                 const firstName = action.payload.firstName
                 draft.user.firstName = firstName
-
                 const lastName = action.payload.lastName
                 draft.user.lastName = lastName
                 const email = action.payload.email
@@ -132,7 +132,6 @@ export default createReducer(initialState, (builder) =>
         })
         // si l'action est de type Rejected
         .addCase(updateRejected, (draft, action) => {
-            draft.status = 'updating'
             if (draft.status === 'updating') {
                 // on passe en rejected, on sauvegarde l'erreur et on supprime les données
                 draft.errorMessage = action.payload
