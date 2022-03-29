@@ -51,7 +51,7 @@ paths:
       security:
         - Bearer: []
       tags:
-        - "User Transaction detail"
+        - User Transaction detail
       summary: "User transaction"
       description: "Show a transaction details"
       operationId: "showTransactionDetails"
@@ -74,6 +74,36 @@ paths:
           description: "User transaction retrieved successully"
           schema:
               $ref: '#/definitions/Transaction'
+        '400':
+          description: "Invalid Fields"
+        '500':
+          description: "Internal Server Error"
+    delete:
+      security:
+        - Bearer: []
+      tags:
+        - Delete User Transaction detail
+      summary: "Delete User transaction"
+      description: "Show a transaction details"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "transactionId"
+          in: "path"
+          description: "ID of transaction is required"
+          required: true
+          type: "integer"
+          format: "int64"
+        - in: header
+          type: "string"
+          name: "Authorization"
+          description: "Attach Bearer JWT token"
+          required: true
+      responses:
+        '200':
+          description: "User transaction deleted successully"
+          schema:
+              $ref: '#/definitions/DeleteTransaction'
         '400':
           description: "Invalid Fields"
         '500':
@@ -158,6 +188,12 @@ definitions:
     properties:
       endDate:
         type: "string"
+  DeleteTransaction:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: int64
   TransactionUpdate:
     type: "object"
     properties:
